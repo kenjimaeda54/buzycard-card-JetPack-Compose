@@ -6,16 +6,22 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.buzzycard.ui.theme.BuzzyCardTheme
@@ -40,6 +46,15 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CreateBizCard() {
+
+    val showPortifolio = remember {
+        mutableStateOf(value = false)
+    }
+
+    fun handleShowPortifolio() {
+        showPortifolio.value = !showPortifolio.value
+    }
+
     //surface seria tipo o canvas, um container
     Surface(modifier = Modifier
         .fillMaxWidth()
@@ -60,10 +75,61 @@ fun CreateBizCard() {
                    CreateProfileImg()
                    Divider()
                    CreateTextDescriptionProfile()
+                   Button(onClick = { handleShowPortifolio() }) {
+                        Text(text = "Protifolio", style = MaterialTheme.typography.button)
+                   }
+                   if(showPortifolio.value) {
+                        Content()
+                   }
+
                }
 
            }
     }
+}
+@Preview
+@Composable
+private fun Content() {
+     Box(modifier = Modifier
+         .fillMaxWidth()
+         .fillMaxHeight()
+         .padding(5.dp)) {
+         //sera a para criar a parte interna do box
+          Surface(
+              modifier = Modifier
+                  .padding(2.dp)
+                  .fillMaxHeight()
+                  .fillMaxWidth(),
+              shape = RoundedCornerShape(
+                  corner = CornerSize(7.dp)
+              ),
+              border = BorderStroke(width = 1.dp,color= Color.LightGray)
+              ) {
+              Portifolio(data =  listOf("project1","project2","projet3","project4","project5"))
+          }
+     }
+}
+
+@Composable
+fun Portifolio(data: List<String>) {
+     LazyColumn(modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp)) {
+         items(data) { item ->
+             Card(modifier = Modifier
+                 .padding(vertical = 10.dp, horizontal = 15.dp)
+                 .fillMaxWidth(),
+                  elevation = 4.dp,
+                 shape = RoundedCornerShape(corner = CornerSize(size = 7.dp))
+                 ) {
+                 Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                     CreateProfileImg(modifier = Modifier.size(50.dp))
+                     Column(modifier = Modifier.padding(horizontal = 10.dp)) {
+                         Text(text = item, fontWeight = FontWeight.Bold)
+                         Text(text = "A great project")
+                     }
+                 }
+             }
+         }
+     }
 }
 
 @Composable
@@ -91,7 +157,7 @@ private fun CreateTextDescriptionProfile() {
 @Composable
 private fun CreateProfileImg(modifier: Modifier = Modifier) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .padding(4.dp)
             .size(150.dp),
         border = BorderStroke(0.5.dp, color = Color.LightGray),
@@ -102,7 +168,7 @@ private fun CreateProfileImg(modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(id = R.drawable.profile_image),
             contentDescription = "profile image",
-            modifier = Modifier.size(135.dp),
+            modifier = modifier.size(135.dp),
             contentScale = ContentScale.Crop
         )
     }
